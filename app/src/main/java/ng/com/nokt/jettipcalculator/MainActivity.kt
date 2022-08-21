@@ -91,30 +91,6 @@ fun TopHeader(totalPerson: Double = 234.0){
 @Composable
 fun MainContent(){
 
-    BillForm(){billAmt->
-        Log.d("BillZ","Bill Amount $billAmt")
-
-    }
-
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun BillForm(modifier: Modifier = Modifier,
-             onValChange:(String)-> Unit = {}
-             ){
-    val totalBillState = remember {
-        mutableStateOf("")
-    }
-    val validState = remember(totalBillState.value) {
-        totalBillState.value.trim().isNotEmpty()
-    }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    val sliderPositionState = remember {
-        mutableStateOf(0f)
-    }
-    val tipPercentage = (sliderPositionState.value * 100).toInt()
     val splitByState = remember {
         mutableStateOf(1)
     }
@@ -129,17 +105,47 @@ fun BillForm(modifier: Modifier = Modifier,
 
     val range = IntRange(start = 1, endInclusive = 100)
 
+    BillForm(
+        splitByState = splitByState,
+        tipAmountState = tipAmountState,
+        totalPerPersonState = totalPerPersonState
+    ){}
+
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun BillForm(modifier: Modifier = Modifier,
+             range: IntRange = 1..100,
+             tipAmountState: MutableState<Double>,
+             splitByState: MutableState<Int>,
+             totalPerPersonState: MutableState<Double>,
+             onValChange:(String)-> Unit = {}
+             ){
+    val totalBillState = remember {
+        mutableStateOf("")
+    }
+    val validState = remember(totalBillState.value) {
+        totalBillState.value.trim().isNotEmpty()
+    }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    val sliderPositionState = remember {
+        mutableStateOf(0f)
+    }
+    val tipPercentage = (sliderPositionState.value * 100).toInt()
+
     Column{
         TopHeader(totalPerson = totalPerPersonState.value)
         Surface(
-            modifier = Modifier
+            modifier = modifier
                 .padding(2.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(corner = CornerSize(12.dp)))
                 .border(BorderStroke(1.dp, Color.LightGray))
         ) {
             Column(
-                modifier = Modifier.padding(6.dp),
+                modifier = modifier.padding(6.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -157,15 +163,15 @@ fun BillForm(modifier: Modifier = Modifier,
                     }
                 )
                 //if (validState){
-                    Row(modifier = Modifier.padding(3.dp),
+                    Row(modifier = modifier.padding(3.dp),
                     horizontalArrangement = Arrangement.Start) {
                         Text(text = "Split",
-                        modifier = Modifier.align(
+                        modifier = modifier.align(
                             alignment = Alignment.CenterVertically
                         ))
-                        Spacer(modifier = Modifier.width(120.dp))
+                        Spacer(modifier = modifier.width(120.dp))
 
-                        Row(modifier = Modifier.padding(horizontal = 3.dp),
+                        Row(modifier = modifier.padding(horizontal = 3.dp),
                             horizontalArrangement = Arrangement.End) {
                             RoundIconButton(
                                 imageVector = Icons.Default.Remove,
@@ -199,18 +205,18 @@ fun BillForm(modifier: Modifier = Modifier,
                     }
 
                 //Tip Row
-                Row(modifier = Modifier.padding(horizontal = 3.dp, vertical = 12.dp)){
+                Row(modifier = modifier.padding(horizontal = 3.dp, vertical = 12.dp)){
                     Text(text = "Tip",
-                        modifier = Modifier.align(alignment = Alignment.CenterVertically))
-                        Spacer(modifier = Modifier.width(200.dp))
+                        modifier = modifier.align(alignment = Alignment.CenterVertically))
+                        Spacer(modifier = modifier.width(200.dp))
                     Text(text = "$${tipAmountState.value}",
-                        modifier = Modifier.align(alignment = Alignment.CenterVertically))
+                        modifier = modifier.align(alignment = Alignment.CenterVertically))
                 }
 
                 Column(verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(text = "$tipPercentage%")
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = modifier.height(10.dp))
 
                     Slider(value = sliderPositionState.value, onValueChange = { newVal ->
                         sliderPositionState.value = newVal
@@ -220,7 +226,7 @@ fun BillForm(modifier: Modifier = Modifier,
                         splitBy = splitByState.value, tipPercentage = tipPercentage)
                         Log.d("Slider", "BillForm: $newVal")
                     },
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                    modifier = modifier.padding(start = 16.dp, end = 16.dp),
                     steps = 5)
                 }
     //            }else{
